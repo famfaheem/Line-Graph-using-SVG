@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Line Graph</title>
+    <style type="text/css">
+    #graph {
+        padding: 40px 40px 0 0;
+        border-radius: 5px;
+        overflow: visible;
+    }
+
+    #graph .points {
+        stroke: #ddd;
+        stroke-width: 2;
+    }
+
+    #graph .labels {
+        font-size: 12px;
+        font-weight: 500;
+        fill: #616161;
+    }
+
+    #graph .grid {
+        stroke: #8e8e8e;
+        stroke-dasharray: 0;
+        stroke-width: 1;
+    }
+
+    #graph .surfaces {
+        fill: none;
+        opacity: 0.8;
+        stroke-width: 1;
+        stroke: #8e8e8e;
+    }
+
+    #graph .surfaces.filled {
+        fill: #0e7331;
+    }
+
+    #graph .grid-lines {
+        stroke: #b3b1b1;
+        stroke-dasharray: 1 2;
+        stroke-width: 1;
+    }
+
+    #graph .grid-lines line:first-child {
+        display: none;
+    }
+    </style>
+</head>
+
+<body>
+    <h3>Line Graph</h3>
+    <div id="myGraph"></div>
+    <script type="text/javascript">
+    var x_label = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX']; //set to empty array if X axis labels are not needed or data points are too many
+    var y_label = [0, 20, 40, 60, 80, 100]; //Y Axis Labels
+    var data = [0, 10, 40, 30, 60, 70, 90, 40, 80]; // Graph point values
+    var filled_graph = false;
+
+
+    function plotGraph(xAxis, yAxis, points, filled) {
+        var plot_points = '<g class="points">';
+        var plot_xLabel = '<g class="labels x-labels">';
+        var plot_yLabel = '<g class="labels y-labels">';
+        var plot_xGrid = '<g class="grid-lines x-grid" id="xGrid">';
+        var plot_yGrid = '<g class="grid-lines y-grid" id="yGrid">';
+        var height = 250;
+        var width = 285;
+        var offset = 25;
+        var point_gap = Math.floor(width / points.length);
+        var el = '<svg id="graph" style="width:' + width + 'px;height:' + (height + 50) + 'px;">';
+
+        for (x = 0, y = offset; x < points.length; x++, y += point_gap) {
+            plot_points += '<circle cx="' + y + '" cy="' + (height - (points[x] * height) / 100) + '" r="3"></circle>';
+            if (xAxis.length) {
+                plot_xLabel += '<text x="' + (y - 5) + '" y="' + (height + 30) + '">' + xAxis[x] + '</text>';
+            }
+        }
+
+        for (i = 0, step = 0; i < yAxis.length; i++, step += 50) {
+            plot_yLabel += '<text x="' + 0 + '" y="' + (height - step + 5) + '">' + yAxis[i] + '</text>';
+            plot_yGrid += '<line x1="' + offset + '" x2="' + width + ' "y1="' + (height - step + 2) + '" y2="' + (height - step + 2) + '"></line>';
+        }
+        plot_points += '</g>';
+        plot_xLabel += '</g>';
+        plot_yLabel += '</g>';
+        plot_yGrid += '</g>';
+        if (filled) {
+            var plot_line = '<g class="surfaces filled"><path class="first_set" d="M' + offset + ',' + height + ' ';
+        } else {
+            var plot_line = '<g class="surfaces"><path class="first_set" d="M' + offset + ',' + height + ' ';
+        }
+        for (l = 1, y = (point_gap + offset); l < points.length; l++, y += point_gap) {
+            plot_line += 'L' + y + ',' + (height - (points[l] * height) / 100) + ' ';
+        }
+        if (filled) {
+            plot_line += ' L' + (y - point_gap) + ',' + height + ' Z"></path></g>';
+        } else {
+            plot_line += '"></path></g>';
+        }
+
+
+        var plot_Axis = '<g class="grid y-grid"><line x1="' + offset + '" x2="' + offset + '" y1="' + -10 + '" y2="' + height + '"></line></g><g class="grid x-grid"><line x1="' + offset + '" x2="' + width + '" y1="' + height + '" y2="' + height + '"></line></g>'
+        el += plot_points + plot_xLabel + plot_yLabel + plot_Axis + plot_line + plot_yGrid + '</svg>'
+        return el;
+    }
+    document.getElementById('myGraph').innerHTML = plotGraph(x_label, y_label, data, filled_graph);
+    </script>
+</body>
+
+</html>
